@@ -182,8 +182,8 @@ contract Voting is Ownable {
 
     function displayWinner() public view returns (Proposal memory) {
         require(
-            workflowStatus == WorkflowStatus.VotingSessionEnded,
-            "Voting period hasn't stopped yet !"
+            workflowStatus == WorkflowStatus.VotesTallied,
+            "Votes hasn't been tailled yet !"
         );
         return proposals[winningProposalId];
     }
