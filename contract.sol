@@ -26,7 +26,6 @@ contract Voting is Ownable {
         VotingSessionEnded,
         VotesTallied
     }
-    // Voter[] voters;
     mapping(address => Voter) public voters;
     WorkflowStatus public workflowStatus;
     Proposal[] public proposals;
@@ -120,15 +119,15 @@ contract Voting is Ownable {
     {
         require(
             workflowStatus == WorkflowStatus.VotingSessionStarted,
-            "This isn't time for voting."
+            "This isn't voting time."
         );
         require(
             voters[msg.sender].hasVoted == false,
             "You already vote for a proposition."
         );
-        proposals[proposalId].voteCount++;
         voters[msg.sender].hasVoted = true;
         voters[msg.sender].votedProposalId = proposalId;
+        proposals[proposalId].voteCount++;
     }
 
     function tailledVote() public onlyOwner {
@@ -155,6 +154,21 @@ contract Voting is Ownable {
             WorkflowStatus.VotesTallied
         );
         emit theWinnerIs(winningProposalId);
+    }
+
+    //Voters can retract their vote during the voting period
+    function retractVote() public onlyVoters(address(msg.sender)) {
+        require(
+            workflowStatus == WorkflowStatus.VotingSessionStarted,
+            "This isn't voting time."
+        );
+        require(
+            voters[msg.sender].hasVoted == true,
+            "You didn't vote for a proposition yet."
+        );
+        proposals[voters[msg.sender].votedProposalId].voteCount--;
+        voters[msg.sender].hasVoted = false;
+        voters[msg.sender].votedProposalId = 0;
     }
 
     function displayWinner() public view returns (Proposal memory) {
