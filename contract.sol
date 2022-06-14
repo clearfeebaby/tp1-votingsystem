@@ -167,7 +167,7 @@ contract Voting is Ownable {
     }
 
     // Admin can reset the entire vote
-    function resetVote() public onlyOwner {
+    function resetElection() public onlyOwner {
         uint256 i;
         RegisteringVoters(whitelist);
         for (i = proposals.length - 1; i > 0; i--) {
