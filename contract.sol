@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.14;
 
-/**
- * @title SampleERC20
- * @dev Create a sample ERC20 standard token
- */
-
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
 
 contract Voting is Ownable {
@@ -156,7 +151,7 @@ contract Voting is Ownable {
         emit theWinnerIs(winningProposalId);
     }
 
-    //Voters can retract their vote during the voting period
+    // Voters can retract their vote during the voting period
     function retractVote() public onlyVoters(address(msg.sender)) {
         require(
             workflowStatus == WorkflowStatus.VotingSessionStarted,
@@ -169,6 +164,20 @@ contract Voting is Ownable {
         proposals[voters[msg.sender].votedProposalId].voteCount--;
         voters[msg.sender].hasVoted = false;
         voters[msg.sender].votedProposalId = 0;
+    }
+
+    // Admin can reset the entire vote
+    function resetVote() public onlyOwner {
+        uint256 i;
+        RegisteringVoters(whitelist);
+        for (i = proposals.length - 1; i > 0; i--) {
+            proposals.pop();
+        }
+        emit WorkflowStatusChange(
+            workflowStatus,
+            WorkflowStatus.RegisteringVoters
+        );
+        workflowStatus = WorkflowStatus.RegisteringVoters;
     }
 
     function displayWinner() public view returns (Proposal memory) {
